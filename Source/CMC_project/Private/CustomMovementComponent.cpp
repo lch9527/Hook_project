@@ -12,7 +12,16 @@ void UCustomMovementComponent::BeginPlay()
 void UCustomMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//ACameraActor
+	/*FVector Start = UpdatedComponent->GetComponentLocation();
+	FVector End = UpdatedComponent->GetForwardVector()*500;
+	FHitResult HookHit;
 
+	GetWorld()->LineTraceSingleByChannel(HookHit, Start, End, ECC_WorldStatic, HookQueryParams);
+	if (HookHit.IsValidBlockingHit()) {
+		DrawDebugSphere(GetWorld(), HookHit.Location, 10, 1, FColor::Red, false, 5, 1, 5);
+	}*/
+	
 
 }
 
