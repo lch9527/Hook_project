@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "CustomMovementComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "CMC_projectCharacter.generated.h"
 
 
@@ -21,6 +22,9 @@ class ACMC_projectCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Hook, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* Hook_start;
 	
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -38,8 +42,16 @@ class ACMC_projectCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Hook, meta = (AllowPrivateAccess = "true"))
+		bool Is_hooking = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Hook, meta = (AllowPrivateAccess = "true"))
+		class URadialForceComponent* Hook_force;
+
+
 public:
 	ACMC_projectCharacter(const FObjectInitializer& ObjectInitializer);
+	
 	
 
 protected:
@@ -52,11 +64,26 @@ protected:
 			
 
 protected:
+
+	FCollisionQueryParams HookQueryParams;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectQueries;
+
+	EObjectTypeQuery Hook_target;
+
+	FHitResult HookHit;
+
+	
+	FHitResult* tmp_hit;
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 	// To add mapping context
 	virtual void BeginPlay();
+
+	virtual void Tick(float DeltaTime);
 	UPROPERTY(Category = Character, VisibleAnywhere, BlueprintReadOnly)
 	class UCustomMovementComponent* CustomMovementComponent;
 
@@ -68,6 +95,15 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UCustomMovementComponent * GetCustomCharacterMovement() const { return CustomMovementComponent; }
+
+
+
+	UFUNCTION(BlueprintCallable)
+		void Try_hook();
+
+	UFUNCTION(BlueprintCallable)
+		void Stop_hook();
+	
 
 };
 

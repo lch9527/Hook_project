@@ -6,11 +6,12 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
-#include "CustomMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+class PrimitiveComponent;
+class CustomMovementComponent;
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -54,7 +55,14 @@ ACMC_projectCharacter::ACMC_projectCharacter(const FObjectInitializer& ObjectIni
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
+	Hook_force = CreateDefaultSubobject<URadialForceComponent>(TEXT("Hook"));
+	//Hook_force->Radius = 50000;
+	Hook_force->Activate(false);
+	Hook_force->ForceStrength = 100;
+	Hook_force->ImpulseStrength = -100;
+	Hook_force->bIgnoreOwningActor = false;
+	Hook_force->bImpulseVelChange = true;
+	HookQueryParams.AddIgnoredActor(this);
 	
 }
 
@@ -63,6 +71,8 @@ void ACMC_projectCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	
+
 	//Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -70,6 +80,49 @@ void ACMC_projectCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+
+	
+	//Hook_target.ObjectTypeQuery1 = GetOwner();
+}
+
+void ACMC_projectCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (Is_hooking) {
+		Hook_force->FireImpulse();
+		//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("In_hook"));
+	}
+
+}
+
+void ACMC_projectCharacter::Try_hook()
+{
+
+	//FVector Start = Hook_start->GetComponentLocation();
+	FVector Start = GetActorLocation();
+	FVector End = FollowCamera->GetForwardVector() * 10000 + Start;
+	
+
+	GetWorld()->LineTraceSingleByChannel(HookHit, Start, End, ECC_WorldStatic, HookQueryParams);
+	if (HookHit.bBlockingHit) {
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Try_hook"));
+		DrawDebugLine(GetWorld(), Start, HookHit.Location, FColor::Red, false, 1, 0, 5);
+		Hook_force->Activate(true);
+		Hook_force->SetWorldLocation(HookHit.Location, false,tmp_hit,ETeleportType::ResetPhysics);
+		Is_hooking = true;
+		CustomMovementComponent->SetMovementMode(MOVE_Flying);
+	}
+
+
+}
+
+void ACMC_projectCharacter::Stop_hook()
+{
+	if (Is_hooking) {
+		Hook_force->Activate(false);
+		Is_hooking = false;
+		CustomMovementComponent->SetMovementMode(MOVE_Falling);
 	}
 }
 
