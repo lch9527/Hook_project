@@ -6,7 +6,6 @@
 #include "UObject/ObjectMacros.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PhysicsEngine/RadialForceComponent.h"
-
 #include "CustomMovementComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -25,6 +24,7 @@ class CMC_PROJECT_API UCustomMovementComponent : public UCharacterMovementCompon
 
 private:
 
+
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
 
 	void SweepAndStoreWallHits();
@@ -37,11 +37,20 @@ private:
 
 	TArray<FHitResult> CurrentWallHits;
 
-
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+
+	void PhysHooking(float deltaTime, int32 Iterations);
+
 public:
+
+	UPROPERTY(Category = "Character Movement: Hook", EditAnywhere)
+	bool Is_hooking = false;
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Components|NavMovement")
+	bool IsHook() const;
 	
 };
