@@ -44,6 +44,7 @@ void UCustomMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 
 void UCustomMovementComponent::PhysHooking(float deltaTime, int32 Iterations)
 {
+	// Super simple version Flying
 		if (deltaTime < MIN_TICK_TIME)
 		{
 			return;
