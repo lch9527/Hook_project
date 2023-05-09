@@ -12,7 +12,7 @@
 
 class PrimitiveComponent;
 class CustomMovementComponent;
-class WidgetComponent;
+
 
 
 //////////////////////////////////////////////////////////////////////////

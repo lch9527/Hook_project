@@ -6,7 +6,6 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "CustomMovementComponent.h"
-#include "Components/WidgetComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "CMC_projectCharacter.generated.h"
 
